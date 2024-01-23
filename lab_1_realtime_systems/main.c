@@ -56,15 +56,18 @@ void setupLCD(){
 	// lcd low power waveform
 	LCDCRA = (1<<LCDEN) | (1<<LCDAB);
 	// lcd control reg b
-	// external clock
-	// lcd mux 11, 1/4 duty
-	LCDCRB = (1<<LCDCS) | (0x3<<LCDMUX0);
+	// external clock, LCDCS
+	// 1/3 Bias, LCD2B = 0
+	// 1/4 duty cycle, mux1:0 0b11 = 0x3
+	// 25 segments , 0b111 = 0x7
+	LCDCRB = (1<<LCDCS) | (0x3<<LCDMUX0) | (0x7<<LCDPM0);
 	// lcd frame rate register
+	// prescaler =16, 0b000
 	// clock divider 8 0x7=0b111
 	LCDFRR = (0x7<<LCDCD0);
 	// lcd contrast control register
 	// lcd voltage 3.35 0xf = 0b1111
-	LCDCCR = (0xf<<LCDCC0);
+	LCDCCR = (0x7<<LCDCC0);
 }
 
 // writes a char over current segments by using or on the registers
@@ -124,16 +127,24 @@ uint8_t writeChar(char ch, uint8_t pos){
 	return err;
 }
 
-//write long, NOTE ONLY USES FIRST 3 digit scince display is broken
 void writeLong(long i){
-	char first = i%10;
+	char d0 = i%10;
 	i = i/10;
-	char second = i%10;
+	char d1 = i%10;
 	i = i/10;
-	char third = i%10;
-	writeChar(first+0x30,2);
-	writeChar(second+0x30,1);
-	writeChar(third+0x30,0);
+	char d2 = i%10;
+	i = i/10;
+	char d3 = i%10;
+	i = i/10;
+	char d4 = i%10;
+	i = i/10;
+	char d5 = i%10;
+	writeChar(d0+0x30,5);
+	writeChar(d1+0x30,4);
+	writeChar(d2+0x30,3);
+	writeChar(d3+0x30,2);
+	writeChar(d4+0x30,1);
+	writeChar(d5+0x30,0);
 }
 
 int is_prime(long i){
@@ -149,7 +160,7 @@ int is_prime(long i){
 
 void primes(){
 	long val = 2;
-	while(val < 1001){
+	while(val < 100001){
 		if(is_prime(val) == 1){
 			// print to screen
 			writeLong(val);
@@ -171,6 +182,7 @@ void write_to_timer_compare(uint16_t val){
 int main(void)
 {	
 	setupLCD();
+	primes();
 	while (1)
 	{
 		toogle_s1();
@@ -179,6 +191,5 @@ int main(void)
 			_delay_ms(100);
 		}
 	}
-    //primes();
 }
 
