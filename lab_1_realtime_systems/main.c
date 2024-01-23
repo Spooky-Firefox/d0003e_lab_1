@@ -35,7 +35,7 @@ struct digit_reg {
 
 
 // note return the position of the char at the left position
-struct digit_reg* scc_to_digit_reg(struct digit_reg* digit, uint16_t scc){
+void scc_to_digit_reg(struct digit_reg* digit, uint16_t scc){
 	digit->x0 = (uint8_t)(scc & 0x000f);
 	digit->x5 = (uint8_t)((scc & 0x00f0) >> 4);
 	digit->x10 = (uint8_t)((scc & 0x0f00) >> 8);
@@ -77,12 +77,17 @@ void write_over_digit_reg(volatile uint8_t* reg_ptr, struct digit_reg *digit){
 
 // and the relevant digit register with the mask, useful for clearing digits
 void and_digit_reg(volatile uint8_t* reg_ptr, uint8_t mask){
-	*reg_ptr = *reg_ptr & mask;
+	// anding the mask to make it ignore the 1 2 5 6 bits
+	// 0b10011001 = 0x99
+	*reg_ptr = *reg_ptr & (mask & 0x99);
 	*(reg_ptr+5) = *(reg_ptr+5) & mask;
 	*(reg_ptr+10) = *(reg_ptr+10) & mask;
 	*(reg_ptr+15) = *(reg_ptr+15) & mask;
 }
 
+void toogle_s1(){
+	LCDDR0 = LCDDR0 ^ 0x06;
+}
 // the function defined in part one of the lab
 // 0 no error
 // 1 pos out of range
@@ -153,11 +158,27 @@ void primes(){
 	}
 }
 
+void write_to_counter(uint16_t val){
+	// writing the high byte to tmp
+	TCNT1H = (uint8_t)(val>>8);
+	// writing the low bytes to lower, causeing temp to become higher;
+	TCNT1L = (uint8_t)val;
+}
+
+void write_to_timer_compare(uint16_t val){
+	OCR1A = val;
+}
 int main(void)
 {	
 	setupLCD();
-
-
-    primes();
+	while (1)
+	{
+		toogle_s1();
+		for (uint8_t i = 0; i<40; i++)
+		{
+			_delay_ms(100);
+		}
+	}
+    //primes();
 }
 
