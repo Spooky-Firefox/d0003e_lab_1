@@ -131,12 +131,33 @@ void writeLong(long i){
 	writeChar(third+0x30,0);
 }
 
+int is_prime(long i){
+	long n = 2;
+	while(n < i){
+		if (i % n == 0){
+			return 0;
+		}
+		n++;
+	}
+	return 1;
+}
+
+void primes(){
+	long val = 2;
+	while(val < 1001){
+		if(is_prime(val) == 1){
+			// print to screen
+			writeLong(val);
+		}
+		val = val + 1;
+	}
+}
 
 int main(void)
 {	
 	setupLCD();
 
 
-    writeLong(123);
+    primes();
 }
 
