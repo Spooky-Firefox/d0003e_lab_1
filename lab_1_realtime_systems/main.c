@@ -119,25 +119,24 @@ uint8_t writeChar(char ch, uint8_t pos){
 	return err;
 }
 
+//write long, NOTE ONLY USES FIRST 3 digit scince display is broken
+void writeLong(long i){
+	char first = i%10;
+	i = i/10;
+	char second = i%10;
+	i = i/10;
+	char third = i%10;
+	writeChar(first+0x30,2);
+	writeChar(second+0x30,1);
+	writeChar(third+0x30,0);
+}
+
 
 int main(void)
 {	
 	setupLCD();
 
 
-    /* Replace with your application code */
-    while (1) 
-    {	
-		for(uint8_t k = 0; k<6;k++){
-			for(uint8_t i = 0;i<10;i++) {
-				writeChar(i+0x30,k);
-						
-				// delay for 0.5 second ish, note different clock so delay is not accurate
-				for(uint8_t j = 0; j<40;j++){
-					_delay_ms(100);
-				}
-			}
-		}
-    }
+    writeLong(123);
 }
 
