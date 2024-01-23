@@ -35,13 +35,11 @@ struct digit_reg {
 
 
 // note return the position of the char at the left position
-struct digit_reg scc_to_digit_reg(uint16_t scc){
-	struct digit_reg out = {0,0,0,0};
-	out.x0 = (uint8_t)(scc & 0x000f);
-	out.x5 = (uint8_t)((scc & 0x00f0) >> 4);
-	out.x10 = (uint8_t)((scc & 0x0f00) >> 8);
-	out.x15 = (uint8_t)((scc & 0xf000) >> 12);
-	return out;
+struct digit_reg* scc_to_digit_reg(struct digit_reg* digit, uint16_t scc){
+	digit->x0 = (uint8_t)(scc & 0x000f);
+	digit->x5 = (uint8_t)((scc & 0x00f0) >> 4);
+	digit->x10 = (uint8_t)((scc & 0x0f00) >> 8);
+	digit->x15 = (uint8_t)((scc & 0xf000) >> 12);
 }
 
 // converts a digit_reg struct to have char at right by shifting the bits
@@ -85,6 +83,43 @@ void and_digit_reg(volatile uint8_t* reg_ptr, uint8_t mask){
 	*(reg_ptr+15) = *(reg_ptr+15) & mask;
 }
 
+// the function defined in part one of the lab
+// 0 no error
+// 1 pos out of range
+uint8_t writeChar(char ch, uint8_t pos){
+	// to test if pos is out of range
+	uint8_t err = 0x00;
+	if (pos > 5){
+		err = err | 0x01;
+	}
+	if(err){
+		return err;
+	}
+	
+	// convert char num to uint8
+	uint8_t num = ch-0x30;
+	struct digit_reg digit = {0,0,0,0};
+	// if the char is is a valid number convert the digit to represent it
+	if (num < 10){
+		scc_to_digit_reg(&digit,numbers[num]);
+	}
+	
+	// calculate the register and if its the low or high nibble to write to
+	volatile uint8_t* reg = &LCDDR0 + pos/2;
+	uint8_t is_right = pos % 2;
+	
+	if(is_right){
+		and_digit_reg(reg,0x0f);
+		digit_reg_to_right(&digit);
+	} else {
+		and_digit_reg(reg,0xf0);
+	}
+	
+	write_over_digit_reg(reg,&digit);
+	return err;
+}
+
+
 int main(void)
 {	
 	setupLCD();
@@ -92,16 +127,15 @@ int main(void)
 
     /* Replace with your application code */
     while (1) 
-    {
-		for(uint8_t i = 0;i<10;i++) {
-			struct digit_reg tmp = scc_to_digit_reg(numbers[i]);
-			digit_reg_to_right(&tmp);
-			and_digit_reg(&LCDDR0, 0x00);
-			write_over_digit_reg(&LCDDR0, &tmp);
-			
-			// delay for one second ish, note difrent clock so delay is not acurate
-			for(uint8_t j = 0; j<80;j++){
-				_delay_ms(100);
+    {	
+		for(uint8_t k = 0; k<6;k++){
+			for(uint8_t i = 0;i<10;i++) {
+				writeChar(i+0x30,k);
+						
+				// delay for 0.5 second ish, note different clock so delay is not accurate
+				for(uint8_t j = 0; j<40;j++){
+					_delay_ms(100);
+				}
 			}
 		}
     }
