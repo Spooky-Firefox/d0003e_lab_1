@@ -79,7 +79,7 @@ void and_digit_reg(volatile uint8_t* reg_ptr, uint8_t mask){
 	*(reg_ptr+15) = *(reg_ptr+15) & mask;
 }
 
-void toogle_s1(){
+void toggle_s1(){
 	LCDDR0 = LCDDR0 ^ 0x06;
 }
 // the function defined in part one of the lab

@@ -9,28 +9,8 @@
 #include <util/delay.h>
 #include <stdint.h>
 #include "lcd.h"
+#include "primes.h"
 
-int is_prime(long i){
-	long n = 2;
-	while(n < i){
-		if (i % n == 0){
-			return 0;
-		}
-		n++;
-	}
-	return 1;
-}
-
-void primes(){
-	long val = 2;
-	while(val < 100001){
-		if(is_prime(val) == 1){
-			// print to screen
-			writeLong(val);
-		}
-		val = val + 1;
-	}
-}
 
 void write_to_counter(uint16_t val){
 	// writing the high byte to tmp
@@ -45,10 +25,11 @@ void write_to_timer_compare(uint16_t val){
 int main(void)
 {	
 	setupLCD();
-	primes();
 	while (1)
 	{
-		toogle_s1();
+		toggle_s1();
+		writeLong(prime);
+		next_prime();
 		for (uint8_t i = 0; i<40; i++)
 		{
 			_delay_ms(100);
