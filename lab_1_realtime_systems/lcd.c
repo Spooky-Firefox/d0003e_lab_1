@@ -72,8 +72,8 @@ void write_over_digit_reg(volatile uint8_t* reg_ptr, struct digit_reg *digit){
 // and the relevant digit register with the mask, useful for clearing digits
 void and_digit_reg(volatile uint8_t* reg_ptr, uint8_t mask){
 	// anding the mask to make it ignore the 1 2 5 6 bits
-	// 0b10011001 = 0x99
-	*reg_ptr = *reg_ptr & (mask & 0x99);
+	// 0b01100110 = 0x66
+	*reg_ptr = *reg_ptr & (mask | 0x66);
 	*(reg_ptr+5) = *(reg_ptr+5) & mask;
 	*(reg_ptr+10) = *(reg_ptr+10) & mask;
 	*(reg_ptr+15) = *(reg_ptr+15) & mask;
