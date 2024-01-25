@@ -15,8 +15,8 @@ uint8_t is_prime(uint32_t  i){
 
 // setts prime to be the next prime larger than the current prime
 void next_prime(){
-	prime = prime +1;
+	prime = prime +2;
 	while(!is_prime(prime)){
-		prime = prime +1;
+		prime = prime +2;
 	}
 }
