@@ -24,7 +24,6 @@ struct digit_reg {
 	uint8_t x15;
 };
 
-
 // note return the position of the char at the left position
 void scc_to_digit_reg(struct digit_reg* digit, uint16_t scc){
 	digit->x0 = (uint8_t)(scc & 0x000f);
@@ -41,6 +40,7 @@ void digit_reg_to_right(struct digit_reg *digit_reg){
 	digit_reg->x15 = digit_reg->x15 << 4;
 }
 
+// enables and sets up the display
 void setupLCD(){
 	// lcd control reg a
 	// lcd enable
@@ -79,9 +79,21 @@ void and_digit_reg(volatile uint8_t* reg_ptr, uint8_t mask){
 	*(reg_ptr+15) = *(reg_ptr+15) & mask;
 }
 
+// toggles the s1
 void toggle_s1(){
 	LCDDR0 = LCDDR0 ^ 0x06;
 }
+
+// toggles the s9
+void toggle_s9(){
+	LCDDR2 = LCDDR2 ^ 0x06;
+}
+
+// toggles the s4
+void toggle_s4(){
+	LCDDR1 = LCDDR1 ^ 0x42;  
+}
+
 // the function defined in part one of the lab
 // 0 no error
 // 1 pos out of range
@@ -118,6 +130,7 @@ uint8_t writeChar(char ch, uint8_t pos){
 	return err;
 }
 
+// writes a long to the display
 void writeLong(long i){
 	char d0 = i%10;
 	i = i/10;
