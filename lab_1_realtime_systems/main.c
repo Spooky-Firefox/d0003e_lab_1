@@ -7,13 +7,12 @@
  
 
 #include <avr/io.h>
-#include <util/delay.h>
 #include <stdint.h>
 #include "lcd.h"
 #include "primes.h"
 
 // clock 8MHz
-// prescaler 1024
+// prescaler 256
 // inc 8MHz/256 = 31250Hz
 // 0.5s*31250(1/s) = 15625
 #define DELAY_0_5_SEC 15625
@@ -29,11 +28,11 @@ void setupTIMER(){
 uint16_t read_counter(){
 	// reading lower bit, saves higer bit to tmp
 	uint8_t lower = TCNT1L;
-	// reading higer bit from tmp
+	// reading higher bit from tmp
 	uint8_t higer = TCNT1H;
+	// concating the bits
 	return ((uint16_t)higer<<8) | (uint16_t)lower;
 }
-
 
 
 uint16_t next_count_value;
@@ -61,10 +60,6 @@ uint8_t passed_0_5_sec(){
 		return 0;
 	}
 }
-
-
-
-
 
 int main(void)
 {	
